@@ -1,0 +1,35 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "standard"
+  ],
+  "env": {
+    "browser": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 10,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "brace-style": ["error", "stroustrup"],
+    "comma-dangle": ["warn", "never"],
+    "import/first": "warn",
+    "no-console": "off",
+    "no-multiple-empty-lines": ["error", { "max": 2 }],
+    "no-new": "warn",
+    "no-unused-vars": ["warn", { "vars": "all", "args": "none", "ignoreRestSiblings": true }],
+    "padded-blocks": ["error", { "blocks": "never", "switches": "never", "classes": "always" }],
+    "space-before-function-paren": ["error", "never"],
+    "react/display-name": "off",
+    "react/prop-types": "off"
+  }
+}

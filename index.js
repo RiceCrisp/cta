@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path')
 const dotenv = require('dotenv')
-const { Client } = require('pg')
+const { Pool } = require('pg')
 const cron = require('node-cron')
 const Twitter = require('twitter')
 
@@ -14,15 +14,20 @@ const twitter = new Twitter({
   access_token_secret: process.env.ACCESS_TOKEN_SECRET
 })
 
-const client = new Client({
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
+})
+
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err)
+  process.exit(-1)
 })
 
 const app = express()
 app.use(express.static(path.join(__dirname, 'public')))
 app.get('/tweets/', async (req, res) => {
-  const tweets = await getTweets(client)
+  const tweets = await getTweets()
   res.json(tweets)
 })
 app.get('*', (req, res) => {
@@ -36,8 +41,8 @@ cron.schedule('0 0,12 * * *', () => {
   checkTweets()
 })
 
-async function getTweets(client) {
-  const res = await client.query('SELECT * FROM tweets;')
+async function getTweets() {
+  const res = await pool.query('SELECT * FROM tweets;')
   return res.rows
 }
 
@@ -51,10 +56,10 @@ function getLastTweet(client) {
 }
 
 async function checkTweets() {
-  await client.connect()
+  const client = await pool.connect()
   console.log('connected')
   let lastTweet = await getLastTweet(client)
-  console.log('lastTweet')
+  console.log('last tweet:', lastTweet)
   const args = { screen_name: 'cta', exclude_replies: true, count: 200 }
   if (lastTweet) {
     args.since_id = lastTweet
@@ -92,13 +97,19 @@ async function checkTweets() {
         }
       }
     })
-    client.query(`UPDATE latest SET value = ${lastTweet || tweets[0].id} WHERE key = 'last_post'`, (err, res) => {
-      if (err) throw err
-    })
+
+    // Save the id of the last tweet pulled
+    promises.push(client.query(`UPDATE latest SET value = ${lastTweet || tweets[0].id} WHERE key = 'last_post'`))
+
+    // Remove rows over a year old
+    const today = new Date()
+    promises.push(client.query(`DELETE FROM tweets WHERE date < '${today.getFullYear() - 1}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}'`))
+
+    // All SQL updates complete
     Promise.all(promises)
       .then(res => {
         console.log('done')
-        // client.end()
+        client.release()
       })
       .catch(err => {
         console.log(`Error in executing ${err}`)
@@ -108,8 +119,9 @@ async function checkTweets() {
 
 function updateTable(client, tweet, line, warnings) {
   return new Promise(resolve => {
-    client.query(`INSERT INTO tweets VALUES (${tweet.id}, '${tweet.created_at}', '${line}', ${warnings.includes('minor_delays')}, ${warnings.includes('major_delays')}, ${warnings.includes('significant_delays')}, ${warnings.includes('planned_work')}, ${warnings.includes('service_disruption')});`, (err, res) => {
+    client.query(`INSERT INTO tweets VALUES (${tweet.id}, '${tweet.created_at}', '${line}', ${warnings.includes('minor_delays')}, ${warnings.includes('major_delays')}, ${warnings.includes('significant_delays')}, ${warnings.includes('planned_work')}, ${warnings.includes('service_disruption')}) WHERE ${tweet.id} NOT IN (SELECT id FROM tweets);`, (err, res) => {
       if (err) throw err
+      console.log('here')
       resolve()
     })
   }).catch(err => err)

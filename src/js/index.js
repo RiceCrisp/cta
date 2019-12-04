@@ -76,6 +76,7 @@ function drawChart() {
       return res.json()
     })
     .then(json => {
+      declareWinner(json)
       issuesChart(json)
       totalIssuesChart(json)
       timelineChart(json)
@@ -85,6 +86,18 @@ function drawChart() {
         timelineChart(json)
       })
     })
+}
+
+function declareWinner(json) {
+  const lines = [...colors.map(c => {
+    return {
+      name: c.name,
+      issues: json.filter(d => d.line === c.slug).length
+    }
+  })]
+  const highest = Math.max(...lines.map(l => l.issues))
+  const winners = lines.filter(l => l.issues === highest).map(l => l.name + ' Line')
+  document.querySelector('.winner').innerHTML = `🎉 ${winners.join(' & ')} <span style="display:inline-block;transform:scaleX(-1)">🎉</span>`
 }
 
 function issuesChart(json) {

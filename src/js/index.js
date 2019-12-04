@@ -1,4 +1,6 @@
 /* globals google */
+import '../css/index.css'
+
 google.charts.load('current', { packages: ['bar', 'line'] })
 google.charts.setOnLoadCallback(drawChart)
 
@@ -77,6 +79,11 @@ function drawChart() {
       issuesChart(json)
       totalIssuesChart(json)
       timelineChart(json)
+      window.addEventListener('resize', e => {
+        issuesChart(json)
+        totalIssuesChart(json)
+        timelineChart(json)
+      })
     })
 }
 
@@ -112,9 +119,6 @@ function issuesChart(json) {
   ])
 
   const options = {
-    chart: {
-      title: 'Which CTA line sucks most?'
-    },
     colors: colors.map(c => c.hex)
   }
 
@@ -169,9 +173,6 @@ function totalIssuesChart(json) {
   ])
 
   const options = {
-    chart: {
-      title: 'Which CTA line sucks most?'
-    },
     isStacked: true
   }
 
@@ -202,9 +203,6 @@ function timelineChart(json) {
   ])
 
   const options = {
-    chart: {
-      title: 'Which CTA line sucks most?'
-    },
     colors: colors.map(c => c.hex)
   }
 

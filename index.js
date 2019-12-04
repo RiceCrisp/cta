@@ -32,7 +32,7 @@ app.listen(process.env.PORT)
 
 checkTweets()
 
-cron.schedule('0 0 * * *', () => {
+cron.schedule('0 0,12 * * *', () => {
   checkTweets()
 })
 

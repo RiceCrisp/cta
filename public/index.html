@@ -4,12 +4,36 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/dist/index.min.css">
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript" src="/dist/index.min.js"></script>
 </head>
 <body>
-  <div id="issues" style="width: 800px; height: 500px;"></div>
-  <div id="total-issues" style="width: 800px; height: 500px;"></div>
-  <div id="timeline" style="width: 800px; height: 500px;"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-xl-8 col-lg-10">
+        <h1>Which CTA line sucks most?</h1>
+        <p>We all know the Chicago Transit Authority and their ubiquitous elevated rail sucks, but in what discrete and quantifiable ways does it suck? We look to answer these questions here.</p>
+      </div>
+      <div class="col-xs-12">
+        <h2>Issues by Line</h2>
+        <div id="issues" class="chart" style="width: 100%; height: 500px;"></div>
+      </div>
+      <div class="col-xs-12">
+        <h2>Total Issues by Line</h2>
+        <div id="total-issues" class="chart" style="width: 100%; height: 500px;"></div>
+      </div>
+      <div class="col-xs-12">
+        <h2>Issues over Time</h2>
+        <div id="timeline" class="chart" style="width: 100%; height: 500px;"></div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="container">
+      <p>Useless shit created by <a href="https://blakeboucher.com">Blake Boucher</a></p>
+    </div>
+  </footer>
 </body>
 </html>

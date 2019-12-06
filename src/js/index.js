@@ -202,7 +202,11 @@ function timelineChart(json) {
     }
     dates[date].push(tweet)
   })
-  const datesArray = Object.values(dates).reverse()
+  const datesArray = Object.values(dates).sort((a, b) => {
+    const aDate = new Date(a[0].date)
+    const bDate = new Date(b[0].date)
+    return aDate - bDate
+  })
 
   const data = google.visualization.arrayToDataTable([
     ['', ...colors.map(c => c.name)],

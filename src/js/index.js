@@ -211,9 +211,9 @@ function timelineChart(json) {
   const data = google.visualization.arrayToDataTable([
     ['', ...colors.map(c => c.name)],
     ...datesArray.map(d => {
-      const date = d[0].date.split('T')[0]
+      const date = new Date(d[0].date.split('T')[0])
       return [
-        date,
+        `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`,
         ...colors.map(c => d.filter(v => v.line === c.slug).length)
       ]
     })

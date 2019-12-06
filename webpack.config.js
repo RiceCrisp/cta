@@ -11,7 +11,6 @@ const themeDir = ''
 module.exports = (env, argv) => ({
   devtool: argv.mode === 'development' ? 'cheap-module-source-map' : false,
   entry: {
-    // 'css': path.resolve(__dirname, themeDir + 'src/css/index.css'),
     'js': path.resolve(__dirname, themeDir + 'src/js/index.js')
   },
   optimization: {

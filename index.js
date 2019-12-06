@@ -99,7 +99,7 @@ async function checkTweets() {
     })
 
     // Save the id of the last tweet pulled
-    promises.push(client.query(`UPDATE latest SET value = ${lastTweet || tweets[0].id} WHERE key = 'last_post'`))
+    promises.push(client.query(`UPDATE latest SET value = ${tweets.length ? tweets[0].id : lastTweet} WHERE key = 'last_post'`))
 
     // Remove rows over a year old
     const today = new Date()
@@ -119,9 +119,10 @@ async function checkTweets() {
 
 function updateTable(client, tweet, line, warnings) {
   return new Promise(resolve => {
-    client.query(`INSERT INTO tweets VALUES (${tweet.id}, '${tweet.created_at}', '${line}', ${warnings.includes('minor_delays')}, ${warnings.includes('major_delays')}, ${warnings.includes('significant_delays')}, ${warnings.includes('planned_work')}, ${warnings.includes('service_disruption')});`, (err, res) => {
+    client.query(`INSERT INTO tweets (id, date, line, minor_delays, major_delays, significant_delays, planned_work, service_disruption)
+    VALUES (${tweet.id}, '${tweet.created_at}', '${line}', ${warnings.includes('minor_delays')}, ${warnings.includes('major_delays')}, ${warnings.includes('significant_delays')}, ${warnings.includes('planned_work')}, ${warnings.includes('service_disruption')})
+    ON CONFLICT (id) DO NOTHING;`, (err, res) => {
       if (err) throw err
-      console.log('here')
       resolve()
     })
   }).catch(err => err)
